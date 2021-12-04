@@ -11,11 +11,11 @@ module.exports = function (RED) {
             node.on('input', function (msg) {
                 const { payload, attributes, mode, target_humidity } = msg
                 try {
-                    // 更新状态
+                    // update state
                     if (payload) {
                         ha.publish_state(payload)
                     }
-                    // 更新属性
+                    // update attributes
                     if (attributes) {
                         ha.publish_attributes(attributes)
                     }
@@ -31,7 +31,7 @@ module.exports = function (RED) {
             })
             const { command_topic, target_humidity_command_topic, target_humidity_state_topic,
                 mode_state_topic, mode_command_topic } = ha.config
-            // 订阅主题
+            // Subscribe to topics
             ha.subscribe(command_topic, (payload) => {
                 ha.send_payload(payload, 1, 3)
                 ha.publish_state(payload)
@@ -56,7 +56,7 @@ module.exports = function (RED) {
                 max_humidity: 80
             })
         } else {
-            this.status({ fill: "red", shape: "ring", text: "未配置MQT" });
+            this.status({ fill: "red", shape: "ring", text: "MQTT is not configured" });
         }
     })
 }
