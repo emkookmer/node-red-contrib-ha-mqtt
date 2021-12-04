@@ -3,9 +3,10 @@ const pinyin = require("node-pinyin")
 
 const pk = JSON.parse(fs.readFileSync(__dirname + '/package.json', 'utf-8'))
 
-function object_id(name) {
-    let arr = pinyin(name, { style: 'normal' })
-    return arr.map(ele => ele[0]).join('_')
+var camalize = function  camalize ( str )  {
+    return str.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, function(match, chr) {
+        return chr.toUpperCase();
+    });
 }
 
 const DiscoveryDevice = {}
@@ -15,11 +16,21 @@ module.exports = class {
         node.config = cfg.config
         this.node = node
         const { name } = cfg
-        const entity_id = object_id(name)
+        const entity_id = camalize(name)
         const type = node.type.replace('ha-mqtt-', '')
         const topic = `ha-mqtt/${type}/${entity_id}/`
+        const device = Object.assign(
+            {
+                name: 'Home Assistant',
+                identifiers: ['ha-mqtt-default-device'],
+                model: 'HA-MQTT',
+                sw_version: pk.version
+            }, 
+            (({ name, identifiers }) => ({ name, identifiers }))(cfg.device)
+        )
         this.config = {
             name,
+            device,
             unique_id: topic.replace(/\//g, '_'),
             discovery_topic: `homeassistant/${type}/${entity_id}/config`,
             state_topic: `${topic}state`,
@@ -106,20 +117,14 @@ module.exports = class {
 
     // Send entity configuration to home assistant
     publish_config(data) {
-        const { name, unique_id, discovery_topic, state_topic, json_attr_t } = this.config
+        const { name, device, unique_id, discovery_topic, state_topic, json_attr_t } = this.config
         // Merge configurations
         const mergeConfig = Object.assign({
             name,
             unique_id,
             state_topic,
             json_attr_t,
-            device: {
-                name: 'Home Assistant',
-                identifiers: ['635147515-shaonianzhentan'],
-                manufacturer: "shaonianzhentan",
-                model: 'HA-MQTT',
-                sw_version: pk.version
-            }
+            device
         }, data)
         // Remove empty/null  configuration properties
         Object.keys(mergeConfig).forEach(key => {
@@ -127,7 +132,9 @@ module.exports = class {
                 delete mergeConfig[key]
             }
         })
-        this.publish(discovery_topic, mergeConfig)
+        
+        // todo make retain configurable
+        this.publish(discovery_topic, mergeConfig,"",{retain: true})
         this.node.status({ fill: "green", shape: "ring", text: `Update configuration：${name}` });
     }
 
@@ -223,7 +230,7 @@ module.exports = class {
     }
 
     // Publish data
-    publish(topic, payload, msg = "") {
+    publish(topic, payload, msg = "", options) {
         const type = Object.prototype.toString.call(payload)
         switch (type) {
             case '[object Uint8Array]':
@@ -236,7 +243,7 @@ module.exports = class {
                 payload = String(payload)
                 break;
         }
-        this.node.server.client.publish(topic, payload)
+        this.node.server.client.publish(topic, payload, options)
         if (msg) {
             this.node.status({ fill: "green", shape: "ring", text: `${msg}：${payload}` });
         }
