@@ -10,7 +10,7 @@ module.exports = function (RED) {
             const node = this
             node.on('input', function (msg) {
                 try {
-                    // 更新状态
+                    // update state
                     ha.publish_state(cfg.name)
                 } catch (ex) {
                     node.status({ fill: "red", shape: "ring", text: JSON.stringify(ex) });
@@ -25,7 +25,7 @@ module.exports = function (RED) {
                 topic: state_topic
             })
         } else {
-            this.status({ fill: "red", shape: "ring", text: "未配置MQT" });
+            this.status({ fill: "red", shape: "ring", text: "MQTT is not configured" });
         }
     })
 }
