@@ -11,11 +11,11 @@ module.exports = function (RED) {
             node.on('input', function (msg) {
                 const { payload, attributes } = msg
                 try {
-                    // 更新状态
+                    // update state
                     if (payload) {
                         ha.publish_state(payload)
                     }
-                    // 更新属性
+                    // update attributes
                     if (attributes) {
                         ha.publish_attributes(attributes)
                     }
@@ -25,7 +25,7 @@ module.exports = function (RED) {
             })
             ha.discovery({})
         } else {
-            this.status({ fill: "red", shape: "ring", text: "未配置MQT" });
+            this.status({ fill: "red", shape: "ring", text: "MQTT is not configured" });
         }
     })
 }
