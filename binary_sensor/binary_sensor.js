@@ -11,11 +11,11 @@ module.exports = function (RED) {
             node.on('input', function (msg) {
                 const { payload, attributes } = msg
                 try {
-                    // 更新状态
+                    // update status
                     if (payload) {
                         ha.publish_state(payload)
                     }
-                    // 更新属性
+                    // update attributes
                     if (attributes) {
                         ha.publish_attributes(attributes)
                     }
