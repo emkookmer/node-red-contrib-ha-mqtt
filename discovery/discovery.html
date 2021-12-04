@@ -3,7 +3,7 @@
         <label for="node-input-server">MQTT</label>
         <select id="node-input-server"></select>
     </div>
-    <div class="form-tips"> By sending <b>online</b> to <b>homeassistant/status</b>, All related devices under the current device will be automatically discovered</div>
+    <div class="form-tips"> By sending <b>online</b> to <b>homeassistant/status</b>, All subscibed devices connected to this MQTT server will send their configuration/discovery messages</div>
 </script>
 <script type="text/javascript">
     RED.nodes.registerType('ha-mqtt-discovery', {
@@ -17,7 +17,7 @@
         inputs: 1,
         outputs: 0,
         label: function () {
-            return "Discovered Home Assistant Devices";
+            return "Discover Home Assistant Devices";
         }
     });
 </script>
