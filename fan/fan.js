@@ -11,11 +11,11 @@ module.exports = function (RED) {
             node.on('input', function (msg) {
                 const { payload, attributes, preset_mode, percentage, oscillation } = msg
                 try {
-                    // 更新状态
+                    // update state
                     if (payload) {
                         ha.publish_state(payload)
                     }
-                    // 更新属性
+                    // update attributes
                     if (attributes) {
                         ha.publish_attributes(attributes)
                     }
@@ -35,7 +35,7 @@ module.exports = function (RED) {
             const { command_topic, oscillation_state_topic, oscillation_command_topic,
                 percentage_state_topic, percentage_command_topic,
                 preset_mode_state_topic, preset_mode_command_topic } = ha.config
-            // 开关
+            // Subscribe to topics
             ha.subscribe(command_topic, (payload) => {
                 ha.send_payload(payload, 1, 4)
                 ha.publish_state(payload)
@@ -66,7 +66,7 @@ module.exports = function (RED) {
                 speed_range_max: 10
             })
         } else {
-            this.status({ fill: "red", shape: "ring", text: "未配置MQT" });
+            this.status({ fill: "red", shape: "ring", text: "MQTT is not configured" });
         }
     })
 }
