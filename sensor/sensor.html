@@ -32,7 +32,9 @@
         paletteLabel: 'sensor',
         defaults: {
             server: { value: "", type: "mqtt-broker", required: true },
-            name: { value: "", required: true },
+            name: { value: "", type: "ha-device", required: true },
+            device_class: { value: null },
+            state_class: { value: null },
             unit_of_measurement: { value: "" },
             config: { value: "" }
         },
